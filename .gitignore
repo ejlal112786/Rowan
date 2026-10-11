@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js build output
+.next/
+out/
+build/
+.vercel/
+
+# Next.js generated type declarations
+next-env.d.ts
+next.config.ts.timestamp-*
+tsconfig.tsbuildinfo
+
+# Test output and coverage
+coverage/
+.vitest/
+*.lcov
+
+# Environment files — NEVER commit real secrets.
+# .env.example is intentionally tracked as documentation.
+.env
+.env.*
+!.env.example
+
+# Local tooling and editor state
+.DS_Store
+Thumbs.db
+*.pem
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# TypeScript build info
+*.tsbuildinfo
