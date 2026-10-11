@@ -136,9 +136,12 @@ retries. No limiter runs yet, and Rowan must not be exposed to untrusted traffic
 
 Implemented now:
 
-- Security headers applied to every route in `next.config.ts`: `X-Frame-Options: DENY`,
-  `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`,
-  `Permissions-Policy` denying camera, microphone, geolocation, and payment.
+- Security headers applied to every route in `next.config.ts`: `X-Content-Type-Options: nosniff`,
+  `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` denying camera,
+  microphone, geolocation, and payment. Production builds additionally send
+  `X-Frame-Options: DENY`; development builds omit that header because local review tooling embeds
+  the dev server in a cross-origin frame. A Content-Security-Policy with `frame-ancestors` replaces
+  this arrangement in Phase 9.
 - `poweredByHeader: false` (no framework disclosure).
 - React strict mode enabled; production builds fail on type errors.
 - No `dangerouslySetInnerHTML`, no `eval`, no dynamic code generation anywhere in the codebase.
