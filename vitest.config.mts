@@ -50,6 +50,20 @@ export default defineConfig({
           include: ["tests/components/**/*.test.{ts,tsx}"],
         },
       },
+      {
+        extends: true,
+        test: {
+          name: "integration",
+          environment: "node",
+          include: ["tests/integration/**/*.test.ts"],
+          // One throwaway PostgreSQL serves the whole project, so files run in
+          // sequence and share a connection budget instead of racing for ports.
+          fileParallelism: false,
+          globalSetup: ["./tests/integration/global-setup.ts"],
+          testTimeout: 30_000,
+          hookTimeout: 120_000,
+        },
+      },
     ],
   },
 });

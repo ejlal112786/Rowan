@@ -8,6 +8,7 @@ import { AppShell } from "@/components/app-shell/app-shell";
 import { Sidebar } from "@/components/app-shell/sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { appConfig } from "@/config/app";
+import { getCurrentUser } from "@/lib/auth/session";
 import { getPublicEnv } from "@/lib/env/public";
 
 /**
@@ -34,7 +35,14 @@ export function generateMetadata(): Metadata {
   };
 }
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  // One session resolution per request (React caches it), so the shell can render the
+  // accurate account state without every component re-asking the provider.
+  const user = await getCurrentUser();
+
+  const accountSummary =
+    user === null ? null : { email: user.email, displayName: user.displayName };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
@@ -44,7 +52,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           enableSystem
           disableTransitionOnChange
         >
-          <AppShell sidebar={<Sidebar />}>{children}</AppShell>
+          <AppShell sidebar={<Sidebar user={accountSummary} />} user={accountSummary}>
+            {children}
+          </AppShell>
         </ThemeProvider>
       </body>
     </html>

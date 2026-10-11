@@ -13,12 +13,12 @@ export const appConfig = {
     "Rowan is a multi-provider AI assistant. Connect your own API keys for OpenRouter, Google Gemini, DeepSeek, and Mistral, and work with every model through one consistent interface.",
   /** Current delivery phase. Keep in sync with docs/ROADMAP.md. */
   phase: {
-    current: 1,
+    current: 2,
     total: 10,
-    title: "Architecture and production foundation",
+    title: "Database, authentication, and user accounts",
     next: {
-      number: 2,
-      title: "Database, authentication, and user accounts",
+      number: 3,
+      title: "Secure API-key management and AI-provider integrations",
     },
   },
 } as const;

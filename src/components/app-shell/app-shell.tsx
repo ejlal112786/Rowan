@@ -17,7 +17,16 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
  * The sidebar element is authored once by a server component (`layout.tsx`) and
  * passed in, so this client component only owns layout, not navigation content.
  */
-export function AppShell({ sidebar, children }: { sidebar: ReactNode; children: ReactNode }) {
+export function AppShell({
+  sidebar,
+  user,
+  children,
+}: {
+  sidebar: ReactNode;
+  /** Signed-in summary for the mobile drawer's account area; `null` when anonymous. */
+  user: { email: string; displayName: string | null } | null;
+  children: ReactNode;
+}) {
   const pathname = usePathname();
 
   return (
@@ -31,7 +40,7 @@ export function AppShell({ sidebar, children }: { sidebar: ReactNode; children: 
 
       <header className="border-sidebar-border bg-sidebar sticky top-0 z-40 flex h-14 items-center gap-1 border-b px-2 md:hidden">
         {/* Keyed by route so the drawer state resets on navigation. */}
-        <MobileNavigation key={pathname} />
+        <MobileNavigation key={pathname} user={user} />
         <BrandLink />
         <div className="ml-auto flex items-center gap-1">
           <ThemeToggle />
