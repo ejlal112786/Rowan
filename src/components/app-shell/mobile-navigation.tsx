@@ -3,6 +3,7 @@
 import { Menu } from "lucide-react";
 import { useState } from "react";
 
+import { AccountMenu, type AccountSummary } from "@/components/app-shell/account-menu";
 import { NewChatButton } from "@/components/app-shell/new-chat-button";
 import { SidebarNav } from "@/components/app-shell/sidebar-nav";
 import { BrandLink } from "@/components/brand/brand-link";
@@ -17,7 +18,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
  * state inside an effect. Selecting a destination also closes the drawer, so
  * focus never stays trapped behind the navigation.
  */
-export function MobileNavigation() {
+export function MobileNavigation({ user }: { user: AccountSummary | null }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -32,6 +33,10 @@ export function MobileNavigation() {
         <BrandLink className="mt-8" withTagline />
         <NewChatButton />
         <SidebarNav onNavigate={() => setOpen(false)} />
+
+        <div className="border-sidebar-border mt-auto border-t pt-3">
+          <AccountMenu user={user} />
+        </div>
       </SheetContent>
     </Sheet>
   );

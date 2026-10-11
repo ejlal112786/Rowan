@@ -18,9 +18,10 @@ const READINESS_ITEMS: readonly ReadinessItem[] = [
     detail: "Available now. Responsive layout, light/dark/system theme, keyboard navigation.",
   },
   {
-    label: "Accounts and sign-in",
+    label: "Accounts, profiles, and sessions",
     phase: 2,
-    detail: "No user records or sessions exist yet.",
+    detail:
+      "Available now. Registration, confirmation, sign-in, password reset, profile, session revocation, and account deletion.",
   },
   {
     label: "Provider keys and model catalogue",
@@ -42,7 +43,8 @@ export function WorkspaceReadiness() {
         <CardTitle>Build status</CardTitle>
         <CardDescription>
           Phase {appConfig.phase.current} of {appConfig.phase.total} —{" "}
-          {appConfig.phase.title.toLowerCase()}. No AI provider is called and nothing is persisted.
+          {appConfig.phase.title.toLowerCase()}. Account data is stored in PostgreSQL; no AI
+          provider is called yet.
         </CardDescription>
       </CardHeader>
       <CardContent>

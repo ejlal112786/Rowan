@@ -47,8 +47,8 @@ export const primaryNav: readonly NavItem[] = [
     label: "Settings",
     href: "/settings",
     icon: Settings,
-    description: "Manage your account, provider keys, and assistants.",
-    availability: "planned",
+    description: "Manage your account, profile, password, and sessions.",
+    availability: "available",
   },
 ] as const;
 

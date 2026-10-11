@@ -42,7 +42,10 @@ describe("primaryNav", () => {
 
   it("marks unimplemented destinations as planned", () => {
     const planned = primaryNav.filter((item) => item.availability === "planned").map((n) => n.href);
-    expect(planned).toEqual(["/conversations", "/compare", "/settings"]);
+
+    // Settings became a real destination in Phase 2 (account, profile, sessions); the
+    // conversation and comparison surfaces are still placeholders.
+    expect(planned).toEqual(["/conversations", "/compare"]);
   });
 });
 

@@ -47,6 +47,13 @@ const eslintConfig = defineConfig([
     files: ["src/lib/logger.ts"],
     rules: { "no-console": "off" },
   },
+  {
+    // Developer tooling, not server runtime: the migration CLI's interface *is*
+    // its stdout, and tests report their own setup state. Neither runs inside a
+    // request, so neither can leak a request-scoped secret into a log stream.
+    files: ["scripts/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"],
+    rules: { "no-console": "off" },
+  },
 ]);
 
 export default eslintConfig;

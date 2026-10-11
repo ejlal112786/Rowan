@@ -15,18 +15,18 @@ later phases extend the architecture established in Phase 1 rather than rebuildi
    output are validated.
 5. No secret is committed, logged, or exposed to the browser.
 
-| Phase | Title                                                            | Status       |
-| ----- | ---------------------------------------------------------------- | ------------ |
-| 1     | Architecture and production foundation                           | **Complete** |
-| 2     | Database, authentication, and user accounts                      | Next         |
-| 3     | Secure API-key management and AI-provider integrations           | Planned      |
-| 4     | Unified chat, streaming, and persistent conversations            | Planned      |
-| 5     | Model selection, provider capabilities, and Model Arena          | Planned      |
-| 6     | Attachments, document understanding, and tools                   | Planned      |
-| 7     | User settings, prompt library, search, and workspace management  | Planned      |
-| 8     | Usage tracking, quotas, cost controls, and abuse prevention      | Planned      |
-| 9     | Security hardening, comprehensive testing, and observability     | Planned      |
-| 10    | Vercel production deployment, verification, and launch readiness | Planned      |
+| Phase | Title                                                            | Status                                        |
+| ----- | ---------------------------------------------------------------- | --------------------------------------------- |
+| 1     | Architecture and production foundation                           | **Complete**                                  |
+| 2     | Database, authentication, and user accounts                      | **Implemented** — hosted verification pending |
+| 3     | Secure API-key management and AI-provider integrations           | Planned                                       |
+| 4     | Unified chat, streaming, and persistent conversations            | Planned                                       |
+| 5     | Model selection, provider capabilities, and Model Arena          | Planned                                       |
+| 6     | Attachments, document understanding, and tools                   | Planned                                       |
+| 7     | User settings, prompt library, search, and workspace management  | Planned                                       |
+| 8     | Usage tracking, quotas, cost controls, and abuse prevention      | Planned                                       |
+| 9     | Security hardening, comprehensive testing, and observability     | Planned                                       |
+| 10    | Vercel production deployment, verification, and launch readiness | Planned                                       |
 
 ---
 
@@ -77,7 +77,7 @@ the environment provides no Vercel credentials. Phase 10 covers deployment verif
 
 ---
 
-## Phase 2 — Database, authentication, and user accounts
+## Phase 2 — Database, authentication, and user accounts ⚙️
 
 **Objective:** Introduce PostgreSQL persistence and real multi-user authentication, and enforce
 ownership on every data path.
@@ -105,6 +105,33 @@ ownership on every data path.
 - Sign-out and account deletion revoke server-side session state.
 - `pnpm verify` passes with the new tests; migrations apply cleanly from an empty database.
 - README and `docs/ARCHITECTURE.md` updated; the shell no longer says "no accounts".
+
+**Status: implemented and locally verified. Hosted verification is pending.**
+
+| Deliverable                                                    | State                                                                                                 |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Committed, versioned migrations                                | `supabase/migrations/*.sql`, applied by `pnpm db:migrate`; checksums detect drift                     |
+| Core schema with ownership columns                             | `users`, `profiles`, `user_sessions`; ownership enforced by `on delete cascade` and foreign keys      |
+| Row-level security                                             | Policies on every user-owned table, scoped to a least-privilege `rowan_app` role                      |
+| `getCurrentUser()` session interface                           | `src/lib/auth/session.ts`, provider-neutral; only two modules know the provider is Supabase           |
+| Registration, sign-in, sign-out, verification, reset, deletion | All implemented as server actions and route handlers; validated and enumeration-resistant             |
+| Route protection                                               | `src/proxy.ts` for refinement, `requireUser()` in protected layouts, owner checks in the data layer   |
+| Ownership-scoped data access                                   | `withUserContext()` + RLS; `tests/integration/row-level-security.test.ts` proves isolation            |
+| Env vars in Zod schema, `.env.example`, README                 | `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `TEST_DATABASE_URL` |
+| Account settings surface                                       | `/settings` (profile) and `/settings/security` (password, sessions, deletion)                         |
+| Tests                                                          | Unit, component, and integration suites; migrations and isolation run against a real PostgreSQL       |
+| CI                                                             | `.github/workflows/ci.yml` provisions a `postgres:17` service container for the integration project   |
+
+**Verified in this repository:** migrations apply to an empty database and are idempotent; the
+runtime role cannot bypass row-level security; cross-tenant reads and writes fail closed; no token
+is written to browser storage; sign-out, revocation, and deletion terminate server-side session
+state; formatting, linting, type checking, all tests, and the production build pass with an empty
+environment.
+
+**Not verified — requires external infrastructure:** hosted Supabase authentication (email
+delivery, confirmation links, recovery, account deletion against a real project) and any Vercel
+deployment. Until those are performed, treat Phase 2 as code-complete rather than production-ready;
+Phase 10 owns the deployment verification.
 
 ---
 

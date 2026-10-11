@@ -1,8 +1,9 @@
 name: CI
 
 # Runs on every pull request and on pushes to the primary branch.
-# No AI provider key, database URL, or other production credential is required:
-# every step below must pass with an empty environment.
+# No AI provider key, database credential, or other production secret is required: the
+# workflow provisions its own throwaway PostgreSQL for the integration suite, and every
+# other step passes with an empty environment.
 on:
   push:
     branches: [main]
@@ -26,6 +27,23 @@ jobs:
     name: Lint, type check, test, build
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
+    # The integration suite proves that migrations apply to an empty database and that
+    # row-level security isolates tenants. It runs against this container rather than the
+    # binaries bundled with `embedded-postgres`, so CI depends on nothing but the image.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rowan_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Check out repository
@@ -53,8 +71,17 @@ jobs:
       - name: Type check
         run: pnpm run typecheck
 
-      - name: Run tests
-        run: pnpm run test
+      # Unit and component tests need nothing but Node.
+      - name: Run unit and component tests
+        run: pnpm exec vitest run --project unit --project components
+
+      # Migrations and tenant isolation, against the service container above. The global
+      # setup applies every migration to the freshly created database.
+      - name: Run integration tests
+        run: pnpm run test:integration
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/rowan_test
+          CI: "true"
 
       - name: Build
         run: pnpm run build
